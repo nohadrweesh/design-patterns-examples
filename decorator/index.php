@@ -46,7 +46,7 @@ class DataSourceDecorator implements IDataSource{ //Wrapper
 }
 
 
-class EncryptionDecorator implements IDataSource{ //Wrapper
+class EncryptionDecorator extends DataSourceDecorator{ //Wrapper
 
 	/*
 	*@var DataSource
@@ -69,7 +69,7 @@ class EncryptionDecorator implements IDataSource{ //Wrapper
 }
 
 
-class CompressionDecorator implements IDataSource{ //Wrapper
+class CompressionDecorator extends DataSourceDecorator{ //Wrapper
 
 	/*
 	*@var DataSource
