@@ -1,14 +1,18 @@
 <?php
 
+interface IDataSource{
+	public function readData();
+	public function writeData($data);
+}
 
-class DataSource{
+class FileDataSource implements IDataSource{
 	private $filename;
 
 	public function __construct($filename){
 		$this->filename=$filename;
 	}
 
-	public function readFile(){
+	public function readData(){
 		return "Reading File : ".$this->filename."\n";
 	}
 
@@ -17,16 +21,86 @@ class DataSource{
 	}
 }
 
+//The Base Decorator that simply delegates all work to wrapped component WIHOUT adding any Logic
+
+class DataSourceDecorator implements IDataSource{ //Wrapper
+
+	/*
+	*@var DataSource
+	*/
+	protected $wrapee; 
+
+	public function __construct(IDataSource $dataSource){
+		$this->wrapee=$dataSource;
+	}
+
+	public function readData(){
+		return $this->wrapee->readData();
+	}
+
+	public function writeData($data){
+		return $this->wrapee->writeData($data);
+	}
+
+
+}
+
+
+class EncryptionDecorator implements IDataSource{ //Wrapper
+
+	/*
+	*@var DataSource
+	*/
+	protected $wrapee; 
+
+	public function __construct(IDataSource $dataSource){
+		$this->wrapee=$dataSource;
+	}
+
+	public function readData(){
+		return "Decrypting Data, " .$this->wrapee->readData();
+	}
+
+	public function writeData($data){
+		return "Encrypting Data , " .$this->wrapee->writeData($data);
+	}
+
+
+}
+
+
+class CompressionDecorator implements IDataSource{ //Wrapper
+
+	/*
+	*@var DataSource
+	*/
+	protected $wrapee; 
+
+	public function __construct(IDataSource $dataSource){
+		$this->wrapee=$dataSource;
+	}
+
+	public function readData(){
+		return "DeCompressing  Data, " .$this->wrapee->readData();
+	}
+
+	public function writeData($data){
+		return "Compressing Data , " .$this->wrapee->writeData($data);
+	}
+
+
+}
+
 class Application{
 
 
 	public function loadSalaries(){
-		$source = new DataSource("salaries.txt");
-		return $source->readFile();
+		$source = new CompressionDecorator(new EncryptionDecorator(new FileDataSource("salaries.txt")));
+		return $source->readData();
 	}
 
 	public function modifySalaries(){
-		$source = new DataSource("salaries.txt");
+		$source = new CompressionDecorator(new EncryptionDecorator(new FileDataSource("salaries.txt")));
 		return $source->writeData(json_encode([
 			"employee1"=>100,
 			"employee2"=>150,
