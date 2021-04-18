@@ -91,6 +91,7 @@ class CompressionDecorator implements IDataSource{ //Wrapper
 
 }
 
+//SIMPLE Usage ,the client Code here know exactly what dedorators it needs
 class Application{
 
 
@@ -113,6 +114,57 @@ class Application{
 
 echo (new Application())->loadSalaries();
 echo (new Application())->modifySalaries();
+
+
+
+//Dynamically determine decorators(configuration at runtime)
+
+
+class SalaryManager{
+	private $source;//IDataSource
+
+	public function __construct(IDataSource $dataSource){
+		$this->source=$dataSource;
+	}
+
+	public function load(){
+		return $this->source->readData();
+	}
+
+	public function save(){
+		$salaryRecords=[
+			"employee3"=>113,
+			"employee4"=>320,
+		];
+		return $this->source->writeData(json_encode($salaryRecords));
+	}
+}
+
+class ApplicationConfigurator{
+	private $enableCompression;
+	private $enableEncryption;
+
+	public function __construct(){
+		$this->enableCompression=true;
+		$this->enableEncryption=true;
+	}
+
+	public function simulateRead(){
+		$source= new FileDataSource('salaries.txt');
+
+		if($this->enableCompression)
+			$source=new CompressionDecorator($source);
+		if($this->enableEncryption)
+			$source=new EncryptionDecorator($source);
+
+		$manager =new SalaryManager($source);
+		return $manager->load();
+	}
+
+}
+
+
+echo (new ApplicationConfigurator())->simulateRead();
 
 
 
