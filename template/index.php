@@ -1,25 +1,29 @@
 <?php
 
+// the Template Method pattern when you want to let clients extend only particular steps of an algorithm, but not the whole algorithm or its structure.
+
+//Like the addPrimaryToppings method here
+
 abstract class Sub{
-    public function make(){
+    final public function make(){
         return $this->layBread()
                     ->addLettuce()
                     ->addSauces()
                     ->addPrimaryToppings();
     }
 
-    protected function layBread(){
+    final protected function layBread(){
         var_dump("Laying Bread ...");
         return $this;
     }
 
 
-    protected function addLettuce(){
+    final protected function addLettuce(){
         var_dump("Adding Lettuce ...");
         return $this;
     }
 
-    protected function addSauces(){
+    final protected function addSauces(){
         var_dump("Adding Sauces ...");
         return $this;
     }
